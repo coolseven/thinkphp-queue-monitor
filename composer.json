@@ -1,6 +1,6 @@
 {
     "name": "coolseven/thinkphp-queue-monitor",
-    "description": "a command line tool that helps monitoring thinkphp-queue's running statics",
+    "description": "Command line tool to monitor thinkphp-queue",
     "keywords":["thinkphp-queue" ,"queue-monitor"],
     "authors": [
         {

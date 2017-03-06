@@ -1,11 +1,12 @@
 # thinkphp-queue-monitor
 
 [thinkphp-queue](https://github.com/top-think/think-queue) 的监控工具。
+**开发中**, 请不要在生产环境使用
 
 ### 安装
 
 ```bash
-composer install coolseven/thinkphp-queue-monitor
+composer require coolseven/thinkphp-queue-monitor
 ```
 
 ### 启动监控
