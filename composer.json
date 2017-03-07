@@ -15,5 +15,10 @@
     },
     "suggest": {
         "coolseven/thinkphp-queue-monitor-admin": ""
+    },
+    "autoload": {
+        "psr-4": {
+            "coolseven\\thinkphp-queue-monitor\\": "src"
+        }
     }
 }
