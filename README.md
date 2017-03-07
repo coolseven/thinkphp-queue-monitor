@@ -10,11 +10,10 @@
 - worker 进程监控 (可关闭) 。监控各个 worker进程 的状态，包括以下信息：
 
   - worker 进程负责的 queue 名称
+  - worker 进程的启动时刻
+  - worker 进程的最近状态，包括busy（任务处理中）， idle （无任务）
+  - worker 进程从上一次监控到本次监控期间，处理的任务数量，以及 sleep 的次数
 
-
-- worker 进程的启动时刻
-- worker 进程的最近状态，包括busy（任务处理中）， idle （无任务）
-    - worker 进程从上一次监控到本次监控期间，处理的任务数量，以及 sleep 的次数
 
 - queue 监控 (可关闭) (支持设置部分队列不作监控)。  监控各个 queue 的状态，包括以下信息：
 
@@ -82,7 +81,7 @@ return [
     'memory'    => 16,  // 监控工具的内存限制，当监控工具本身的内存超限时，将自动退出监控。
     
     //[ 检查 + 告警 ]
-    'alarm'         => false,   // 是否对收集的结果进行检查和告警，暂未实现
+    'alarm'     => false,   // 是否对收集的结果进行检查和告警，暂未实现
     
     //[ 保存监控结果 ]
     'save'       => 'redis',	// 目前只支持将收集的结果保存到 redis
@@ -106,10 +105,11 @@ return [
 php think queue:monitor start
 ```
 
-#### 启动 worker 进程
+#### 启动你的 worker 进程
 
 ```
-php think queue:work --daemon --queue yourQueueName
+php think queue:work --daemon --queue yourQueueName   --tries 1  --sleep 1
+php think queueLwork --daemon --queue yourQueueName2  --tries 2  --sleep 2
 ```
 
 #### 停止监控
@@ -182,7 +182,7 @@ php think queue:monitor report
            $memory = $input->getOption('memory');
 
            if ($input->getOption('daemon')) {
-               Hook::listen('worker_daemon_start',$queue);
+               Hook::listen('worker_daemon_start',$queue);  // 添加了这一行
                $this->daemon(
                    $queue, $delay, $memory,
                    $input->getOption('sleep'), $input->getOption('tries')
@@ -227,13 +227,13 @@ php think queue:monitor report
                    $queue, $delay, $sleep, $maxTries
                );
 
-               if ( $this->memoryExceeded($memory) ) {
-                   Hook::listen('worker_memory_exceeded', $queue);
+               if ( $this->memoryExceeded($memory) ) {				
+                   Hook::listen('worker_memory_exceeded', $queue);		// 添加了这一行
                    $this->stop();
                }
                
                if ( $this->queueShouldRestart($lastRestart) ) {
-                   Hook::listen('worker_queue_restart', $queue);
+                   Hook::listen('worker_queue_restart', $queue);		// 添加了这一行
                    $this->stop();
                }
            }
@@ -269,11 +269,11 @@ php think queue:monitor report
            $job = $this->getNextJob($queue);
 
            if (!is_null($job)) {
-               Hook::listen('worker_before_process', $queue);
+               Hook::listen('worker_before_process', $queue);		// 添加了这一行
                return $this->process($job, $maxTries, $delay);
            }
            
-           Hook::listen('worker_before_sleep', $queue);
+           Hook::listen('worker_before_sleep', $queue);			// 添加了这一行
            $this->sleep($sleep);                     
 
            return ['job' => null, 'failed' => false];

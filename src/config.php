@@ -6,46 +6,39 @@
  * Time: 11:12
  */
 return [
-
-    //监控系统： 收集，检查，告警，保存，展示
-
+    
+    // [支持的命令 ]
     // 开启监控 php think queue:monitor start
     // 结束监控 php think queue:monitor stop
-    // 查看状态 php think queue:monitor status
-
-    // [ 收集 ]
+    // 查看状态 php think queue:monitor report
+    
+    // [ 监控的项目 ]
     'monitorOn' => [
-        'jobs'      => false,
-        'queues'    => true,
-        'workers'   => true,       // 思路： worker 每次循环时，触发一个事件，在该事件的执行代码中保存当前的 pid,uptime
-        'server'    => true,
+        'jobs'      => false,    // 暂不支持
+        'queues'    => true,     // 监控队列
+        'workers'   => true,     // 监控 worker 进程  
+        'server'    => true,     // 监控 Redis Server 状态
     ],
-    'excludeQueues'  => [
-        'default',
-        //'helloJobQueue',
+    // [ 不作监控的 queue ]
+    'excludeQueues'  => [        
     ],
-    'interval'  => 2,   // time interval for monitoring , default is 2 seconds
-    'memory'    => 16,  // memory limit of monitor process, default is 16M.
-
-
+    'interval'  => 2,   // 监控时间间隔，默认每2秒收集一次消息队列的各项信息
+    'memory'    => 16,  // 监控工具的内存限制，当监控工具本身的内存超限时，将自动退出监控。
+    
     //[ 检查 + 告警 ]
-    'alarm'         => true,          // will review the statics and trigger some events if some statics are abnormal
-
-
+    'alarm'     => false,   // 是否对收集的结果进行检查和告警，暂未实现
+    
     //[ 保存监控结果 ]
-    'save'       => 'redis',
+    'save'       => 'redis',    // 目前只支持将收集的结果保存到 redis
     'expire'     => 60,
     'host'       => '127.0.0.1',
     'port'       => 6379,
-    'password'   => 'my_redis_password',
+    'password'   => 'your_redis_password',
     'select'     => 4,
     'timeout'    => 30,
-    'persistent' => true,       // TODO
-
-//    'save'      => 'mongodb',
-
-//    'save'      => 'file',
-//    'baseDir'   =>   '',
-//    'name'      => 'queue:monitor:result',
-//    'maxSize'   => '10M',
+    'persistent' => true, 
+    
+     // 'save'      => 'mongodb',  // 暂不支持将收集的结果保存到 mongodb
+     // 'save'      => 'database'  // 暂不支持将收集的结果保存到 database
+     // 'save'      => 'file',     // 暂不支持将收集的结果保存到 file 
 ];
