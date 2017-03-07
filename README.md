@@ -12,25 +12,25 @@
   - worker 进程负责的 queue 名称
 
 
-  - worker 进程的启动时刻
-  - worker 进程的最近状态，包括busy（任务处理中）， idle （无任务）
-  - worker 进程从上一次监控到本次监控期间，处理的任务数量，以及 sleep 的次数
+- worker 进程的启动时刻
+- worker 进程的最近状态，包括busy（任务处理中）， idle （无任务）
+    - worker 进程从上一次监控到本次监控期间，处理的任务数量，以及 sleep 的次数
 
 - queue 监控 (可关闭) (支持设置部分队列不作监控)。  监控各个 queue 的状态，包括以下信息：
 
-  - queue 名称
-  - queue 中等待处理的任务数量
-  - queue 中延迟处理的任务数量
-  - queue 中正在处理的任务数量
+    - queue 名称
+    - queue 中等待处理的任务数量
+    - queue 中延迟处理的任务数量
+    - queue 中正在处理的任务数量
 
 - Redis Server 监控 (可关闭)。监控 redis 服务的状态，包括以下信息：
 
-  - Redis Server 的 Clients 相关信息
-  - Redis Server 的 Memory 相关信息
-  - Redis Server 的 Persistence 相关信息
-  - Redis Server 的 Stats 相关信息
-  - Redis Server 的 Replication 相关信息
-  - Redis Server 的 CPU  相关信息
+    - Redis Server 的 Clients 相关信息
+    - Redis Server 的 Memory 相关信息
+    - Redis Server 的 Persistence 相关信息
+    - Redis Server 的 Stats 相关信息
+    - Redis Server 的 Replication 相关信息
+    - Redis Server 的 CPU  相关信息
 
 
 
@@ -46,6 +46,58 @@ composer require topthink/think-queue
 
 ```bash
 composer require coolseven/thinkphp-queue-monitor
+```
+
+#### 添加监控配置文件
+
+新增 `application\extra\queue_monitor.php` 配置文件，配置文件选项参考：
+
+```php
+<?php
+/**
+ * tp5的队列监控： 
+ * User: coolseven2013@gmail.com
+ * Date: 2017/2/28 0028
+ * Time: 16:39
+ */
+return [
+    
+    // [支持的命令 ]
+    // 开启监控 php think queue:monitor start
+    // 结束监控 php think queue:monitor stop
+    // 查看状态 php think queue:monitor report
+    
+    // [ 监控的项目 ]
+    'monitorOn' => [
+        'jobs'      => false,    // 暂不支持
+        'queues'    => true,     // 监控队列
+        'workers'   => true,     // 监控 worker 进程  
+        'server'    => true,     // 监控 Redis Server 状态
+    ],
+    // [ 不作监控的 queue ]
+    'excludeQueues'  => [        
+        'default',	
+    ],
+    'interval'  => 2,   // 监控时间间隔，默认每2秒收集一次消息队列的各项信息
+    'memory'    => 16,  // 监控工具的内存限制，当监控工具本身的内存超限时，将自动退出监控。
+    
+    //[ 检查 + 告警 ]
+    'alarm'         => false,   // 是否对收集的结果进行检查和告警，暂未实现
+    
+    //[ 保存监控结果 ]
+    'save'       => 'redis',	// 目前只支持将收集的结果保存到 redis
+    'expire'     => 60,
+    'host'       => '127.0.0.1',
+    'port'       => 6379,
+    'password'   => 'your_redis_password',
+    'select'     => 4,
+    'timeout'    => 30,
+    'persistent' => true, 
+    
+     // 'save'      => 'mongodb',  // 暂不支持将收集的结果保存到 mongodb
+     // 'save'		=> 'database'  // 暂不支持将收集的结果保存到 database
+     // 'save'      => 'file',     // 暂不支持将收集的结果保存到 file 
+];
 ```
 
 #### 启动监控
@@ -76,9 +128,9 @@ php think queue:monitor report
 
 ### TODO
 
-- [ ] job 监控
+- [ ] 支持 job 监控
 - [ ] 支持 database 驱动下的监控
-- [ ] 支持将监控结果保存到 mongodb 或者 database。 目前仅支持保存到 redis。
+- [ ] 支持将监控结果保存到 mongodb， database 或 file。 目前仅支持保存到 redis。
 - [ ] 在终端中查看监控结果
 - [ ] 使用tp5 内置的日志类来保存监控日志
 - [ ] 监控 queue_failed 事件
