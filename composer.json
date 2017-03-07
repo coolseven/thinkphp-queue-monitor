@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "coolseven\\thinkphp-queue-monitor\\": "src"
+            "coolseven\\ThinkphpQueueMonitor\\": "src"
         }
     }
 }
