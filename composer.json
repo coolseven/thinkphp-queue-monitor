@@ -19,6 +19,9 @@
     "autoload": {
         "psr-4": {
             "coolseven\\ThinkphpQueueMonitor\\": "src"
-        }
+        },
+        "files": [
+            "src/addCommand.php"
+        ]
     }
 }
