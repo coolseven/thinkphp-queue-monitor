@@ -6,7 +6,7 @@
  * Time: 10:51
  */
 
-namespace coolseven\ThinkphpQueueMonitor;
+namespace coolseven\ThinkphpQueueMonitor\behavoir;
 
 use think\Config;
 

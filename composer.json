@@ -21,7 +21,7 @@
             "coolseven\\ThinkphpQueueMonitor\\": "src"
         },
         "files": [
-            "src/addCommand.php"
+            "src/bootstrap.php"
         ]
     }
 }
