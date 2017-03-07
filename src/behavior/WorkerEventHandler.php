@@ -6,7 +6,7 @@
  * Time: 10:51
  */
 
-namespace coolseven\ThinkphpQueueMonitor\behavoir;
+namespace coolseven\ThinkphpQueueMonitor\behavior;
 
 use think\Config;
 
@@ -195,4 +195,5 @@ class WorkerEventHandler {
         echo $message.PHP_EOL;
         // TODO cache and save to log file
     }
+
 }
