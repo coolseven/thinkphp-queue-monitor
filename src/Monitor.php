@@ -31,7 +31,12 @@ class Monitor extends Command {
     /**
      * 监控结果保存的key
      */
-    const monitor_statics_key                 = '_monitor:_statics';                  
+    const monitor_statics_key                 = '_monitor:_statics';
+
+    /**
+     * 上次重启时刻的缓存key名
+     */
+    const cache_last_restart_time_key         = 'think:queue:monitor:lastRestartTime';
 
     /**
      * @var array
@@ -79,7 +84,7 @@ class Monitor extends Command {
                 $this->start();
                 break;
             case 'stop':
-                $this->quit();
+                $this->stop();
                 break;
             case 'report':
                 $this->report();
@@ -115,7 +120,7 @@ class Monitor extends Command {
 
         $this->redisClientForQueue   = $this->getRedisForQueue();
         $this->redisClientForStatics = $this->getRedisForStatics();
-        $this->lastRestartTime = Cache::get('think:queue:monitor:stop');
+        $this->lastRestartTime = Cache::get(self::cache_last_restart_time_key);
 
         $this->monitor();
     }
@@ -162,6 +167,7 @@ class Monitor extends Command {
                  */
                 $expected_wake_up_time_second       = $woke_up_time_second + $this->interval ;
                 $sleep_until_time_second            = max( $expected_wake_up_time_second, ceil( microtime(true) ) )  ;
+                $this->log(PHP_EOL);
                 $this->log('[ Info ] monitor finished. next round should start at : '.$sleep_until_time_second.PHP_EOL );
 
                 time_sleep_until($sleep_until_time_second);
@@ -325,6 +331,11 @@ class Monitor extends Command {
         return $workerPids;
     }
 
+    protected function stop(){
+        Cache::set('think:queue:monitor:lastRestartTime',time());
+        $this->log('[ Info ] monitor stop command received. quiting...');
+        $this->quit();
+    }
 
     /**
      * TODO
