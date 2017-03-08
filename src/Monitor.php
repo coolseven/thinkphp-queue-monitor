@@ -149,7 +149,7 @@ class Monitor extends Command {
                     $this->log('[ Warning ] too much time consumed on this round .');
                 }
 
-                if ( $this->lastRestartTime != Cache::get('think:queue:monitor:stop') ) {
+                if ( $this->lastRestartTime != Cache::get(self::cache_last_restart_time_key) ) {
                     $this->log('[ Info ] monitor stop command received. Quiting...');
                     $this->quit();
                 }
@@ -332,7 +332,7 @@ class Monitor extends Command {
     }
 
     protected function stop(){
-        Cache::set('think:queue:monitor:lastRestartTime',time());
+        Cache::set(self::cache_last_restart_time_key,time());
         $this->log('[ Info ] monitor stop command received. quiting...');
         $this->quit();
     }

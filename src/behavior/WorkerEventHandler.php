@@ -162,7 +162,7 @@ class WorkerEventHandler {
     protected static function archiveWorkerByPid($workerPid){
         $redisClient = self::getRedisForStatics();
         if ($workerPid) {
-            self::log('[ Info ] worker '.$workerPid .' will be archived');
+            self::log('[ Info ] statics of worker process '.$workerPid .' will be archived');
 
             $worker_key = self::worker_status_monitoring_key_prefix.$workerPid;
             $redisClient->renameKey($worker_key , self::worker_status_archived_key_prefix.$workerPid.':'.time());    // 加上时间戳，以免workerPid 重复了
@@ -171,7 +171,7 @@ class WorkerEventHandler {
 
     protected static function archiveAllWorkers(){
         $redisClient = self::getRedisForStatics();
-        self::log('[ Info ] all workers will be archived, due to queue restart command.');
+        self::log('[ Info ] queue restart command received. statics of all workers processes will be archived.');
 
         $workers = $redisClient->keys(self::worker_status_monitoring_key_prefix .'*');
         foreach ($workers as $worker_key){
