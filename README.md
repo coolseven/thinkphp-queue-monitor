@@ -109,14 +109,15 @@ return [
 php think queue:monitor start
 ```
 
-#### 启动你的 worker 进程
+#### 启动你的 worker 进程 (建议先启动监控工具，再启动worker)
 
 ```
 php think queue:work --daemon --queue yourQueueName   --tries 1  --sleep 1
-php think queueLwork --daemon --queue yourQueueName2  --tries 2  --sleep 2
+php think queue:work --daemon --queue yourQueueName   --tries 1  --sleep 1
+php think queue:work --daemon --queue yourQueueName2  --tries 2  --sleep 2
 ```
 
-#### 停止监控
+#### 停止监控 (停止监控不会影响worker进程的正常运行)
 
 ```bash
 php think queue:monitor stop
