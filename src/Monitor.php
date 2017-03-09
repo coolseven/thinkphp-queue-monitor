@@ -99,7 +99,7 @@ class Monitor extends Command {
 
         if (empty($this->monitorOptions)) {
             $this->log('[ Error ] Monitor Start Failed! queue monitor config file not found!');
-            throw new Exception('Config File Not Found',500);
+            throw new Exception('Monitor Config File Not Found',500);
         }
 
         $this->interval = intval($this->monitorOptions['interval']);
@@ -356,6 +356,11 @@ class Monitor extends Command {
      */
     protected function getRedisForQueue(){
         $redisConfigForQueue = Config::get('queue');
+
+        if (empty($redisConfigForQueue)) {
+            $this->log('[ Error ] Monitor Start Failed! queue config file not found!');
+            throw new Exception('Queue Config File Not Found',500);
+        }
 
         $redisClient = new \Redis();
         $redisClient->pconnect($redisConfigForQueue['host'],$redisConfigForQueue['port'],$redisConfigForQueue['timeout']);

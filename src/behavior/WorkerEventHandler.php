@@ -22,8 +22,8 @@ class WorkerEventHandler {
     protected static $_last_busy_ts              = 0;          // 最近一次 busy 事件的发生时间
     protected static $_last_idle_ts              = 0;          // 最近一次 idle 事件的发生时间
 
-    protected static $_event_buffer_count_limit  = 500;        // 规定的时间内达到了缓冲事件次数上限，开始写入并清空缓冲
-    protected static $_event_buffer_time_limit   = 5;          // 规定的时间内未达到缓冲事件次数上限，开始写入并清空缓冲
+    protected static $_event_buffer_count_limit  = 50;         // 规定的时间内[ 已达到 ]缓冲事件次数上限，开始写入并清空缓冲
+    protected static $_event_buffer_time_limit   = 5;          // 规定的时间内[ 未达到 ]缓冲事件次数上限，开始写入并清空缓冲
 
     protected static $_buffer_last_flush_ts      = 0;          // 上一次写入并清空缓冲的时间戳
     protected static $_my_pid                    = 0;          // 当前进程的 pid， 和 worker 进程的 pid 是同一个

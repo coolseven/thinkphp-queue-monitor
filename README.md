@@ -3,7 +3,11 @@
 [thinkphp-queue](https://github.com/top-think/think-queue) 的命令行监控工具。
 **尚未开发完成**, **请不要在生产环境使用**
 
-本项目基于 [thinkphp-queue](https://github.com/top-think/think-queue) 这个消息队列库，在该库的基础上增加了消息队列的监控功能。
+本项目基于 [thinkphp-queue](https://github.com/top-think/think-queue) 消息队列库，在该库的基础上增加了消息队列的监控功能。
+
+### 前端效果预览
+
+![监控前端效果预览](https://static.huzhongyuan.com/thinkphp-queue-monitor/queue_statics_preview.png)
 
 ### 可监控的项目：
 
@@ -134,10 +138,14 @@ php think queue:monitor report
 - [ ] 在终端中查看监控结果
 - [ ] 使用tp5 内置的日志类来保存监控日志
 - [ ] 监控 queue_failed 事件
-
+- [ ] 限制监控结果的保存上限
 
 
 ### 备注
+
+**如果需要监控worker进程的状态，那么该监控工具需要放在被监控应用的vendor目录下。**
+
+**如果只监控queue的状态和redis服务器的状态，不监控worker进程的状态，那么该工具可以单独部署到其他机器上，只需保证该机器能够连接到redis队列服务器即可。**
 
 如果你使用的 thinkphp-queue 的版本是 v1.1.3 , 且需要实现 worker 进程的监控，那么需要先在 `vendor\topthink\think-queue\` 的源代码中手动添加worker 相关的进程钩子。
 
