@@ -17,19 +17,17 @@ class WorkerEventHandler {
      * @var int
      */
     protected static $_busy_event_buffer_counter = 0;          // 本次监控期间发生了多少次 busy 事件
-    protected static $_idle_event_buffer_counter = 0;          // 本次监控期间发生了多少次 busy 事件
+    protected static $_idle_event_buffer_counter = 0;          // 本次监控期间发生了多少次 sleep 事件
 
-    protected static $_last_busy_ts       = 0;                 // 最近一次 busy 事件的发生时间
-    protected static $_last_idle_ts       = 0;                 // 最近一次 idle 事件的发生时间
+    protected static $_last_busy_ts              = 0;          // 最近一次 busy 事件的发生时间
+    protected static $_last_idle_ts              = 0;          // 最近一次 idle 事件的发生时间
 
-    protected static $_event_buffer_count_limit   = 500;        // 规定的时间内达到了缓冲事件次数上限，开始写入并清空缓冲
-    protected static $_event_buffer_time_limit    = 5;         // 规定的时间内未达到缓冲事件次数上限，开始写入并清空缓冲
+    protected static $_event_buffer_count_limit  = 500;        // 规定的时间内达到了缓冲事件次数上限，开始写入并清空缓冲
+    protected static $_event_buffer_time_limit   = 5;          // 规定的时间内未达到缓冲事件次数上限，开始写入并清空缓冲
 
-    protected static $_buffer_last_flush_ts = 0;               // 上一次写入并清空缓冲的时间戳
-    protected static $_my_pid               = 0;                 // 当前进程的 pid， 和 worker 进程的 pid 是同一个
+    protected static $_buffer_last_flush_ts      = 0;          // 上一次写入并清空缓冲的时间戳
+    protected static $_my_pid                    = 0;          // 当前进程的 pid， 和 worker 进程的 pid 是同一个
 
-    const worker_status_monitoring_key_prefix = '_monitor:_workers:_monitoring:';     // 监控中的 worker 进程的redis key 前缀
-    const worker_status_archived_key_prefix   = '_monitor:_workers:_archived:';       // 不再监控的 worker 进程的redis key 前缀
 
     /**
      * 记录 worker 进程的启动事件
@@ -110,26 +108,29 @@ class WorkerEventHandler {
     }
 
     /**
-     * 保存事件信息到redis
+     * 保存 worker 进程的 process 事件 和 sleep 事件的相关数据到redis
      * @param $queue
      */
     protected static function _saveBuffer($queue){
-        $worker_last_status = self::$_last_busy_ts >= self::$_last_idle_ts ? 'busy' : 'idle';
-
+        $worker_last_report_status  = self::$_last_busy_ts >= self::$_last_idle_ts ? 'busy' : 'idle';
+        $worker_last_report_ts      = max( self::$_last_busy_ts ,self::$_last_idle_ts );
+        
         $worker_pid = self::getPid();
         $worker_key = self::worker_status_monitoring_key_prefix.$worker_pid;
         $value = json_encode([
-            'queue'                 => $queue,
-            'comment'               => 'worker_status_report',
-            'worker_last_status'    => $worker_last_status,
-            'ts'                    => time(),  // 最后一次捕捉到该 worker 进程的事件的时间，作为 worker 的最后 alive 时间
-            'busy'                  => [
-                'process_count_meanwhile'   => self::$_busy_event_buffer_counter,
-                'last_process_ts'           => self::$_last_busy_ts,
+            'queue'                     => $queue,
+            'comment'                   => 'worker_status_report',
+            'worker_last_report_status' => $worker_last_report_status,      // worker 进程最后一次触发事件时的状态
+            'worker_last_report_ts'     => $worker_last_report_ts,          // worker 进程最后一次触发事件的时间
+            'save_ts'                   => time(),                          // 本次缓冲中的数据保存到 redis 的时间
+            'last_save_ts'              => self::$_buffer_last_flush_ts,    // 上次缓冲中的数据保存到 redis 的时间
+            'busy'                      => [
+                'process_count_meanwhile' => self::$_busy_event_buffer_counter, // 可用于计算任务的消费速度
+                'last_process_ts'         => self::$_last_busy_ts,
             ],
-            'idle'                  => [
-                'sleep_count_meanwhile'     => self::$_idle_event_buffer_counter,
-                'last_sleep_ts'             => self::$_last_idle_ts,
+            'idle'                      => [
+                'sleep_count_meanwhile' => self::$_idle_event_buffer_counter,
+                'last_sleep_ts'         => self::$_last_idle_ts,
             ],
         ]);
 
