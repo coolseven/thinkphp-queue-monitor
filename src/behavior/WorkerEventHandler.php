@@ -105,7 +105,15 @@ class WorkerEventHandler {
      * @param $queue
      */
     protected static function _flush($queue){
+        self::_saveBuffer($queue);
+        self::_clearBuffer();
+    }
 
+    /**
+     * 保存事件信息到redis
+     * @param $queue
+     */
+    protected static function _saveBuffer($queue){
         $worker_last_status = self::$_last_busy_ts >= self::$_last_idle_ts ? 'busy' : 'idle';
 
         $worker_pid = self::getPid();
@@ -128,13 +136,17 @@ class WorkerEventHandler {
         $flushHandler = self::getRedisForStatics();
         $flushHandler->rPush($worker_key ,$value);     // 添加到 List 的尾部
         unset($flushHandler);
+    }
 
+    /**
+     * 清空buffer
+     */
+    protected static function _clearBuffer(){
         // reset buffer related variables
         self::$_busy_event_buffer_counter = 0;
         self::$_idle_event_buffer_counter = 0;
         self::$_buffer_last_flush_ts = time();
     }
-
 
     /**
      * @return \Redis
@@ -152,10 +164,12 @@ class WorkerEventHandler {
 
 
     public static function memoryExceeded(&$queue){
+        self::_flush($queue);
         self::archiveWorkerByPid( self::getPid() );
     }
 
     public static function queueRestart(&$queue){
+        self::_flush($queue);
         self::archiveAllWorkers();
     }
 
